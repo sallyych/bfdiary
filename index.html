@@ -447,13 +447,13 @@ button,input{font:inherit}
           <div class="waiting">
             <div class="waiting-title"><span id="inviteOwner"></span>님의 교환일기</div>
             <div class="waiting-desc">
-              친구가 아직 이름을 적지 않았어요.<br>
-              아래 링크를 보내고 참여를 기다려주세요.
+              친구에게 아래 링크를 보내주세요.<br>
+              친구가 아직 참여하지 않아도 먼저 작성할 수 있어요.
             </div>
             <div class="waiting-link" id="inviteLink"></div>
             <div class="waiting-actions">
               <button id="copyBtn">초대 링크 복사</button>
-              <button id="checkGuestBtn">친구 참여했는지 확인</button>
+              <button id="checkGuestBtn">먼저 시작하기</button>
             </div>
           </div>
         </div>
@@ -483,6 +483,9 @@ button,input{font:inherit}
       </div>
 
       <p class="intro" id="intro"></p>
+      <div id="hostInviteBar" class="hidden" style="margin:10px 0 14px;">
+        <button id="mainCopyInviteBtn" class="secondary" style="width:auto;padding:7px 10px;font-size:11.5px;">초대 링크 복사</button>
+      </div>
       <div id="questions"></div>
 
       <div class="actions">
@@ -757,6 +760,10 @@ function syncResultCommentWidths(root=document){
 
 function renderMain(){
   $("#pairNames").textContent=`${myName} × ${partnerName||"친구"}`;
+  const inviteBar=$("#hostInviteBar");
+  if(inviteBar){
+    inviteBar.classList.toggle("hidden", !(myRole==="host" && (!partnerName || partnerName==="친구")));
+  }
     $("#doneStamp").textContent=stampDate();
 
   let answered=0;
@@ -863,14 +870,6 @@ function renderMain(){
 
 async function enterMain(){
   await loadRoom();
-
-  if(myRole==="host" && (!partnerName || partnerName==="친구")){
-    $("#coverView").classList.remove("hidden");
-    $("#mainView").classList.add("hidden");
-    $("#inviteBox").classList.remove("hidden");
-    return;
-  }
-
   $("#coverView").classList.add("hidden");
   $("#mainView").classList.remove("hidden");
   await loadToday();
@@ -901,11 +900,17 @@ $("#copyBtn").onclick=async()=>{
   catch{toast("링크를 길게 눌러 복사해 주세요.");}
 };
 
+$("#mainCopyInviteBtn").onclick=async()=>{
+  const link=roomLink(roomId,myName);
+  try{await navigator.clipboard.writeText(link);toast("초대 링크를 복사했어요.");}
+  catch{toast("초대 링크 복사에 실패했어요.");}
+};
+
 $("#checkGuestBtn").onclick=async()=>{
   try{
-    await checkGuestAndEnter();
+    await enterMain();
   }catch(e){
-    alert("확인 중 오류가 발생했어요.\n"+e.message);
+    alert("시작 중 오류가 발생했어요.\n"+e.message);
   }
 };
 
@@ -973,7 +978,7 @@ $("#refreshBtn").onclick=async()=>{
         $("#inviteOwner").textContent=myName;
         $("#inviteLink").textContent=link;
         $("#inviteBox").classList.remove("hidden");
-        await checkGuestAndEnter();
+        await enterMain();
       }catch(e){console.error(e)}
     }
   }
