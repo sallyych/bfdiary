@@ -428,6 +428,20 @@ button,input{font:inherit}
   word-break:break-word !important;
 }
 
+
+.home-choice-box{
+  display:grid;
+  gap:10px;
+}
+.home-btn{
+  width:100%;
+  padding:13px 16px;
+}
+.secondary-home{
+  background:transparent;
+  border-style:dashed;
+}
+
 </style>
 </head>
 <body>
@@ -438,7 +452,15 @@ button,input{font:inherit}
       <div class="kicker" id="coverKicker">첫 장</div>
       <h1 class="cover-title">취향 교환일기</h1>
       <p class="cover-desc" id="coverDesc">먼저 내 이름을 적고<br>같이 쓸 사람을 초대해요.</p>
-      <div class="name-area">
+
+      <div id="homeChoice" class="name-area hidden">
+        <div class="home-choice-box">
+          <button class="primary-btn home-btn" id="continueBtn">이전 교환일기 이어하기</button>
+          <button class="primary-btn home-btn secondary-home" id="newDiaryBtn">새 교환일기 만들기</button>
+        </div>
+      </div>
+
+      <div class="name-area" id="createForm">
         <div class="label">내 이름</div>
         <input class="name-input" id="nameInput" placeholder="이름을 적어주세요" maxlength="12">
         <div class="hint" id="coverHint">친구에게는 링크만 보내면 돼요.</div>
@@ -949,9 +971,48 @@ $("#refreshBtn").onclick=async()=>{
   catch(e){alert(e.message)}
 };
 
+
+function showCreateForm(){
+  $("#homeChoice").classList.add("hidden");
+  $("#createForm").classList.remove("hidden");
+  $("#coverKicker").textContent="첫 장";
+  $("#coverDesc").innerHTML="먼저 내 이름을 적고<br>같이 쓸 사람을 초대해요.";
+  $("#coverHint").textContent="친구에게는 링크만 보내면 돼요.";
+  $("#coverBtn").textContent="교환일기 만들기";
+  $("#nameInput").value="";
+  $("#inviteBox").classList.add("hidden");
+}
+
+async function continueLastRoom(){
+  const lastRoom=localStorage.getItem("taste_last_host_room");
+  if(!lastRoom) return showCreateForm();
+  const x=JSON.parse(lastRoom);
+  roomId=x.roomId;
+  myRole="host";
+  myName=x.name;
+  await enterMain();
+}
+
+$("#continueBtn").onclick=async()=>{
+  try{ await continueLastRoom(); }
+  catch(e){
+    console.error(e);
+    alert("이전 교환일기를 불러오지 못했어요. 새 교환일기를 만들어주세요.");
+    showCreateForm();
+  }
+};
+
+$("#newDiaryBtn").onclick=()=>{
+  showCreateForm();
+};
+
 (async function init(){
   const h=parseHash();
+
+  // Invite links always go straight to the guest name-entry flow.
   if(h.join){
+    $("#homeChoice").classList.add("hidden");
+    $("#createForm").classList.remove("hidden");
     $("#coverKicker").textContent="초대장";
     $("#coverDesc").innerHTML=`<b>${h.host||"친구"}</b>님이<br>같이 쓰자고 초대했어요.`;
     $("#coverHint").textContent="이름을 적으면 둘의 교환일기가 시작돼요.";
@@ -963,24 +1024,20 @@ $("#refreshBtn").onclick=async()=>{
         const x=JSON.parse(local);
         roomId=h.join; myRole=x.role; myName=x.name;
         await enterMain();
-      }catch(e){console.error(e)}
+      }catch(e){ console.error(e); }
     }
-  } else {
-    const lastRoom=localStorage.getItem("taste_last_host_room");
-    if(lastRoom){
-      try{
-        const x=JSON.parse(lastRoom);
-        roomId=x.roomId;
-        myRole="host";
-        myName=x.name;
-        const link=roomLink(roomId,myName);
-        $("#nameInput").value=myName;
-        $("#inviteOwner").textContent=myName;
-        $("#inviteLink").textContent=link;
-        $("#inviteBox").classList.remove("hidden");
-        await enterMain();
-      }catch(e){console.error(e)}
-    }
+    return;
+  }
+
+  // Normal site visits never auto-enter an old room.
+  const lastRoom=localStorage.getItem("taste_last_host_room");
+  if(lastRoom){
+    $("#createForm").classList.add("hidden");
+    $("#homeChoice").classList.remove("hidden");
+    $("#coverKicker").textContent="첫 장";
+    $("#coverDesc").innerHTML="이전에 쓰던 교환일기가 있어요.<br>이어 쓰거나 새로 시작할 수 있어요.";
+  }else{
+    showCreateForm();
   }
 })();
 
