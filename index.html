@@ -1018,14 +1018,9 @@ $("#newDiaryBtn").onclick=()=>{
     $("#coverHint").textContent="이름을 적으면 둘의 교환일기가 시작돼요.";
     $("#coverBtn").textContent="함께 쓰기";
 
-    const local=localStorage.getItem("taste_room_"+h.join);
-    if(local){
-      try{
-        const x=JSON.parse(local);
-        roomId=h.join; myRole=x.role; myName=x.name;
-        await enterMain();
-      }catch(e){ console.error(e); }
-    }
+    // Even if this browser has opened the invite before, always require
+    // the guest to enter their name before entering the diary.
+    $("#nameInput").value="";
     return;
   }
 
