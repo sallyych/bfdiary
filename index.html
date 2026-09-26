@@ -577,7 +577,9 @@ async function api(path, opts={}){
   return txt ? JSON.parse(txt) : null;
 }
 function roomLink(id, host){
-  return location.origin + location.pathname + "#join=" + encodeURIComponent(id) + "&host=" + encodeURIComponent(host);
+  // Use a real query-string URL so opening an invite always performs a full page load.
+  // This prevents the creator's already-open question screen from being reused when testing the invite.
+  return location.origin + location.pathname + "?join=" + encodeURIComponent(id) + "&host=" + encodeURIComponent(host);
 }
 function todayKey(){
   return new Date().toLocaleDateString("en-CA");
@@ -586,9 +588,13 @@ function stampDate(){
   const d=new Date();
   return `DONE · ${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")}`;
 }
-function parseHash(){
-  const p=new URLSearchParams(location.hash.replace(/^#/,""));
-  return {join:p.get("join"), host:p.get("host")};
+function parseInvite(){
+  // New links use ?join=... so the browser reloads the page.
+  // Keep #join=... support for any old invitation links already shared.
+  const q=new URLSearchParams(location.search);
+  if(q.get("join")) return {join:q.get("join"), host:q.get("host")};
+  const h=new URLSearchParams(location.hash.replace(/^#/,""));
+  return {join:h.get("join"), host:h.get("host")};
 }
 
 async function createRoom(name){
@@ -910,7 +916,7 @@ $("#coverBtn").onclick=async()=>{
   const name=$("#nameInput").value.trim();
   if(!name) return alert("이름을 적어주세요.");
   try{
-    const h=parseHash();
+    const h=parseInvite();
     if(h.join){
       await joinRoom(h.join,name);
       await enterMain();
@@ -928,7 +934,7 @@ $("#guestStartBtn").onclick=async()=>{
   const name=$("#guestNameInput").value.trim();
   if(!name) return alert("이름을 적어주세요.");
   try{
-    const h=parseHash();
+    const h=parseInvite();
     if(!h.join) return alert("초대 링크 정보가 없어요.");
     await joinRoom(h.join,name);
     await enterMain();
@@ -1026,7 +1032,7 @@ $("#newDiaryBtn").onclick=()=>{
 };
 
 (async function init(){
-  const h=parseHash();
+  const h=parseInvite();
 
   // Invite links ALWAYS stop at a dedicated guest name-entry screen first.
   // No localStorage state is allowed to skip this step.
