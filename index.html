@@ -480,6 +480,13 @@ button,input{font:inherit}
           </div>
         </div>
       </div>
+
+      <div class="name-area hidden" id="guestForm">
+        <div class="label">내 이름</div>
+        <input class="name-input" id="guestNameInput" placeholder="이름을 적어주세요" maxlength="12">
+        <div class="hint" id="guestHint">내 이름을 입력한 뒤에만 질문을 시작할 수 있어요.</div>
+        <div class="cover-actions"><button class="primary-btn" id="guestStartBtn">함께 쓰기</button></div>
+      </div>
     </section>
 
     <section id="mainView" class="hidden">
@@ -917,6 +924,17 @@ $("#coverBtn").onclick=async()=>{
   }catch(e){ alert("오류가 발생했어요.\n"+e.message); }
 };
 
+$("#guestStartBtn").onclick=async()=>{
+  const name=$("#guestNameInput").value.trim();
+  if(!name) return alert("이름을 적어주세요.");
+  try{
+    const h=parseHash();
+    if(!h.join) return alert("초대 링크 정보가 없어요.");
+    await joinRoom(h.join,name);
+    await enterMain();
+  }catch(e){ alert("오류가 발생했어요.\n"+e.message); }
+};
+
 $("#copyBtn").onclick=async()=>{
   try{await navigator.clipboard.writeText($("#inviteLink").textContent);toast("초대 링크를 복사했어요.");}
   catch{toast("링크를 길게 눌러 복사해 주세요.");}
@@ -974,6 +992,7 @@ $("#refreshBtn").onclick=async()=>{
 
 function showCreateForm(){
   $("#homeChoice").classList.add("hidden");
+  $("#guestForm").classList.add("hidden");
   $("#createForm").classList.remove("hidden");
   $("#coverKicker").textContent="첫 장";
   $("#coverDesc").innerHTML="먼저 내 이름을 적고<br>같이 쓸 사람을 초대해요.";
@@ -1009,18 +1028,18 @@ $("#newDiaryBtn").onclick=()=>{
 (async function init(){
   const h=parseHash();
 
-  // Invite links always go straight to the guest name-entry flow.
+  // Invite links ALWAYS stop at a dedicated guest name-entry screen first.
+  // No localStorage state is allowed to skip this step.
   if(h.join){
+    $("#mainView").classList.add("hidden");
+    $("#coverView").classList.remove("hidden");
     $("#homeChoice").classList.add("hidden");
-    $("#createForm").classList.remove("hidden");
+    $("#createForm").classList.add("hidden");
+    $("#guestForm").classList.remove("hidden");
     $("#coverKicker").textContent="초대장";
     $("#coverDesc").innerHTML=`<b>${h.host||"친구"}</b>님이<br>같이 쓰자고 초대했어요.`;
-    $("#coverHint").textContent="이름을 적으면 둘의 교환일기가 시작돼요.";
-    $("#coverBtn").textContent="함께 쓰기";
-
-    // Even if this browser has opened the invite before, always require
-    // the guest to enter their name before entering the diary.
-    $("#nameInput").value="";
+    $("#guestNameInput").value="";
+    $("#guestNameInput").focus();
     return;
   }
 
