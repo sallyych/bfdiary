@@ -1,0 +1,1070 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>취향 교환일기</title>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css');
+
+:root{
+  --bg:#e8e0d2;--paper:#f4ede1;--paper2:#ede4d6;--ink:#2f2b27;
+  --muted:#7e756b;--line:#c5b8a7;--line2:#ddd3c5;--hl:#f2e57b;--friend:#e8dfd0;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink)}
+body{font-family:"Pretendard Variable","Pretendard","Noto Sans KR",system-ui,-apple-system,sans-serif}
+button,input{font:inherit}
+.hidden{display:none!important}
+.stage{min-height:100vh;display:flex;justify-content:center;padding:28px 16px 60px}
+.sheet{width:min(650px,94vw);background:var(--paper);border:1px solid rgba(90,72,53,.12);box-shadow:0 14px 34px rgba(74,58,40,.10);padding:34px 32px 30px;position:relative}
+.sheet:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.13;background-image:radial-gradient(rgba(74,58,40,.12) .6px,transparent .8px),radial-gradient(rgba(255,255,255,.8) .4px,transparent .7px);background-size:10px 10px,14px 14px;background-position:0 0,4px 5px}
+.inner{position:relative;z-index:1}
+.cover-wrap{min-height:560px;display:flex;flex-direction:column;justify-content:center}
+.kicker{display:table;margin:0 auto 20px;border:1px solid var(--line);padding:4px 9px;font-size:11px;color:var(--muted)}
+.cover-title{margin:0;text-align:center;font-size:30px;font-weight:740;letter-spacing:-.055em}
+.cover-desc{text-align:center;color:var(--muted);font-size:14px;line-height:1.7;margin:12px 0 46px}
+.name-area{max-width:360px;margin:0 auto}
+.label{font-size:13px;color:var(--muted);margin-bottom:8px}
+.name-input{width:100%;border:0;border-bottom:1.5px solid var(--line);background:transparent;font-size:22px;letter-spacing:-.035em;padding:10px 2px 12px;outline:none;color:var(--ink)}
+.name-input::placeholder{color:#aea497}
+.hint{margin-top:10px;font-size:11.5px;color:#93897e;line-height:1.6}
+.cover-actions{margin-top:38px;display:flex;justify-content:center}
+.primary-btn{border:1px solid #837769;background:var(--paper2);padding:12px 18px;font-size:13.5px;font-weight:650;color:var(--ink);cursor:pointer}
+.invite-box{margin-top:24px;padding-top:18px;border-top:1px dashed rgba(110,94,77,.35);font-size:12px;color:var(--muted);line-height:1.8}
+.invite-link{margin-top:10px;border:1px solid rgba(110,94,77,.22);background:rgba(255,255,255,.16);padding:12px;word-break:break-all;color:#514a43}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding-bottom:20px;border-bottom:1px solid var(--line2)}
+.names{font-size:23px;font-weight:760;letter-spacing:-.04em}
+.small{margin-top:5px;font-size:12px;color:var(--muted)}
+.date{font-size:11px;color:#968c80;letter-spacing:.03em}
+.completion{display:none;margin:21px 0 3px;padding:15px 14px 14px;border:1px solid #aaa08f;background:rgba(238,230,217,.65)}
+.completion.show{display:block}
+.done-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.done-title{font-size:15px;font-weight:750}
+.stamp{border:1.5px solid #756b60;color:#756b60;padding:5px 8px;font-size:10px;font-weight:760;letter-spacing:.08em;transform:rotate(-3deg)}
+.done-sub{margin-top:7px;font-size:11.5px;color:var(--muted);line-height:1.6}
+.category-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:24px 0 8px}
+.category{display:inline-block;border:1px solid #7b7269;padding:5px 10px;font-size:12px;font-weight:670}
+.progress{font-size:11.5px;color:var(--muted)}
+.intro{margin:8px 0 18px;font-size:12.5px;color:var(--muted);line-height:1.7}
+.q{padding:18px 0 20px;border-bottom:0}
+.qline{font-size:15.5px;line-height:1.8;letter-spacing:-.03em;color:#49433e}
+.opt{cursor:pointer;position:relative;display:inline}
+.opt.selected{font-weight:760;color:#23211f}
+.opt.selected:before{content:"";position:absolute;left:-2px;right:-2px;bottom:.18em;height:.9em;background:var(--hl);z-index:-1;transform:rotate(-1deg)}
+.vs{font-weight:800;color:#222;margin:0 3px}
+.reason{width:100%;margin-top:8px;border:0;border-bottom:1px dashed #bdb1a1;background:transparent;padding:6px 2px 8px;font-size:12.5px;color:#4f4944;outline:none}
+.reason::placeholder{color:#9d9388}
+.q.locked .opt,.q.locked .reason{pointer-events:none}
+.q.locked .reason{opacity:.8}
+.status{margin-top:10px;padding:8px 0 0;font-size:11.5px;color:#91877c}
+.friend{margin-top:11px;padding:11px 12px;background:rgba(232,223,208,.58);border-left:3px solid #aca08e;font-size:12px;color:#5d564f;line-height:1.65}
+.friend-name,.friend-pick{font-weight:720;color:#332f2b}
+.actions{display:flex;flex-direction:column;gap:9px;margin-top:22px}
+.actions button{width:100%;padding:11px 14px;border:1px solid #a99d8d;background:var(--paper2);color:#4f4943;font-size:12.5px;font-weight:650;cursor:pointer}
+.actions button:disabled{opacity:.48;cursor:default}
+.secondary{background:transparent!important;border-style:dashed!important}
+.history{margin-top:28px;padding-top:20px;border-top:1px solid var(--line2)}
+.history-title{font-size:13px;font-weight:720;margin-bottom:10px}
+.history-item{display:flex;justify-content:space-between;gap:12px;padding:10px 0;font-size:12px;color:#5d554e;border-bottom:1px dotted #cfc4b6}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#292622;color:#fff;padding:10px 14px;font-size:12px;border-radius:3px;z-index:20}
+
+.waiting{
+  max-width:380px;
+  margin:0 auto;
+  text-align:center;
+  padding:16px 0 4px;
+}
+.waiting-title{
+  font-size:18px;
+  font-weight:720;
+  letter-spacing:-.035em;
+  margin-bottom:10px;
+}
+.waiting-desc{
+  font-size:12.5px;
+  color:var(--muted);
+  line-height:1.75;
+}
+.waiting-link{
+  margin:18px 0 12px;
+  border:1px solid rgba(110,94,77,.22);
+  background:rgba(255,255,255,.16);
+  padding:12px;
+  word-break:break-all;
+  font-size:11.5px;
+  color:#514a43;
+}
+.waiting-actions{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-top:16px;
+}
+.waiting-actions button{
+  border:1px solid #837769;
+  background:var(--paper2);
+  padding:11px 14px;
+  font-size:12.5px;
+  font-weight:650;
+  color:var(--ink);
+  cursor:pointer;
+}
+
+
+/* FINAL RESULT LAYOUT */
+.qline{
+  display:grid;
+  grid-template-columns:fit-content(46%) auto fit-content(46%);
+  column-gap:8px;
+  justify-content:start;
+  align-items:start;
+  font-size:15.5px;
+  line-height:1.65;
+  letter-spacing:-.03em;
+  color:#49433e;
+}
+.choice-col{
+  min-width:0;
+}
+.choice-text{
+  display:inline;
+}
+.choice-text.selected{
+  font-weight:760;
+  color:#23211f;
+  background:linear-gradient(
+    transparent 47%,
+    var(--hl) 47%,
+    var(--hl) 88%,
+    transparent 88%
+  );
+}
+.qline .vs{
+  font-weight:800;
+  color:#222;
+  margin:0;
+}
+.choice-comments{
+  display:grid;
+  gap:3px;
+  margin-top:5px;
+  max-width:100%;
+}
+.choice-comment{
+  display:grid;
+  grid-template-columns:12px auto minmax(0,1fr);
+  column-gap:4px;
+  align-items:start;
+  min-width:0;
+  font-size:11.3px;
+  line-height:1.48;
+  color:#766d64;
+}
+.choice-comment .arrow{
+  font-weight:800;
+}
+.choice-comment.my-comment .arrow,
+.choice-comment.my-comment .comment-name{
+  color:#617899;
+}
+.choice-comment.partner-comment .arrow,
+.choice-comment.partner-comment .comment-name{
+  color:#c7473b;
+}
+.choice-comment .comment-name{
+  font-weight:760;
+  white-space:nowrap;
+}
+.choice-comment .comment-text{
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+
+.choice-col.inactive 
+
+/* FINAL POLISH */
+.q{
+  border-bottom:0 !important;
+  padding:18px 0 20px;
+}
+.top{
+  align-items:flex-start;
+}
+.choice-col.inactive 
+/* submitted comparison */
+.choice-comments{
+  display:grid;
+  gap:4px;
+  margin-top:6px;
+  max-width:100%;
+}
+.choice-comment{
+  display:grid;
+  grid-template-columns:12px auto minmax(0,1fr);
+  column-gap:4px;
+  align-items:start;
+  min-width:0;
+  font-size:11.4px;
+  line-height:1.5;
+  color:#746b62;
+}
+.choice-comment .arrow{
+  font-weight:800;
+}
+.choice-comment.my-comment .arrow,
+.choice-comment.my-comment .comment-name{
+  color:#617899;
+}
+.choice-comment.partner-comment .arrow,
+.choice-comment.partner-comment .comment-name{
+  color:#c7473b;
+}
+.choice-comment .comment-name{
+  font-weight:760;
+  white-space:nowrap;
+}
+.choice-comment .comment-text{
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+
+
+/* comment style collision fix */
+.choice-comment{
+  background:transparent !important;
+  border:0 !important;
+  border-left:0 !important;
+  padding:0 !important;
+  margin:0 !important;
+}
+.choice-comments{
+  background:transparent !important;
+  border:0 !important;
+}
+
+@media(max-width:640px){
+  .qline{
+    font-size:14px;
+    column-gap:6px;
+  }
+  .choice-comment{
+    font-size:10.8px;
+    grid-template-columns:11px auto minmax(0,1fr);
+    column-gap:3px;
+  }
+}
+
+@media(max-width:640px){.sheet{padding:28px 18px 26px}.cover-title{font-size:27px}.names{font-size:21px}.qline{font-size:14.5px}}
+
+/* FINAL COMPACT SPACING */
+.qline{
+  display:grid !important;
+  grid-template-columns:fit-content(46%) auto fit-content(46%) !important;
+  justify-content:start !important;
+  column-gap:8px !important;
+  align-items:start !important;
+}
+.choice-col{
+  min-width:0;
+}
+.choice-comments{
+  width:100%;
+}
+@media(max-width:640px){
+  .qline{
+    grid-template-columns:fit-content(45%) auto fit-content(45%) !important;
+    column-gap:6px !important;
+  }
+}
+
+
+/* FINAL DRAFT ALIGNMENT FIX */
+.choice-col{
+  display:inline-grid;
+  width:fit-content;
+  max-width:100%;
+  min-width:0;
+}
+.choice-col.inactive 
+
+/* FINAL INPUT + HIGHLIGHT FIX */
+.choice-text{
+  justify-self:start !important;
+  width:fit-content !important;
+  max-width:100%;
+}
+.choice-text.selected{
+  display:inline !important;
+  box-decoration-break:clone;
+  -webkit-box-decoration-break:clone;
+  padding:0 !important;
+}
+.question-comment-input{
+  width:100%;
+  margin-top:8px;
+  border:0;
+  border-bottom:1px dashed #bdb1a1;
+  background:transparent;
+  padding:6px 1px 7px;
+  font:inherit;
+  font-size:11.8px;
+  color:#5f574f;
+  outline:none;
+}
+.question-comment-input::placeholder{
+  color:#a59b90;
+}
+
+
+/* FINAL RESULT TIGHTENING */
+.choice-text{
+  display:inline !important;
+  width:auto !important;
+  max-width:100%;
+  justify-self:start !important;
+}
+.choice-text.selected{
+  display:inline !important;
+  width:auto !important;
+  max-width:100%;
+  box-decoration-break:clone;
+  -webkit-box-decoration-break:clone;
+  padding:0 !important;
+  background:linear-gradient(
+    transparent 47%,
+    var(--hl) 47%,
+    var(--hl) 88%,
+    transparent 88%
+  ) !important;
+}
+.choice-comments{
+  display:grid;
+  gap:4px;
+  margin-top:6px;
+  width:fit-content !important;
+  max-width:100% !important;
+  justify-items:start;
+}
+.choice-comment{
+  display:grid !important;
+  grid-template-columns:12px auto minmax(0,auto) !important;
+  column-gap:4px;
+  align-items:start;
+  width:fit-content !important;
+  max-width:100% !important;
+  min-width:0;
+  padding:0 !important;
+  margin:0 !important;
+  background:transparent !important;
+  border:0 !important;
+  border-left:0 !important;
+}
+.choice-comment .comment-text{
+  display:block;
+  min-width:0;
+  max-width:100%;
+  width:auto;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  white-space:normal;
+}
+
+
+/* v5: comment width exactly follows its choice text */
+.choice-comments{
+  display:grid !important;
+  gap:4px !important;
+  margin-top:6px !important;
+  justify-items:stretch !important;
+  max-width:none !important;
+}
+.choice-comment{
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  display:grid !important;
+  grid-template-columns:12px auto minmax(0,1fr) !important;
+  column-gap:4px !important;
+  align-items:start !important;
+  padding:0 !important;
+  margin:0 !important;
+  background:transparent !important;
+  border:0 !important;
+}
+.choice-comment .comment-text{
+  min-width:0 !important;
+  width:auto !important;
+  max-width:100% !important;
+  white-space:normal !important;
+  overflow-wrap:anywhere !important;
+  word-break:break-word !important;
+}
+
+
+/* v7: lock result comment width to selected text width */
+.choice-col{
+  min-width:0;
+}
+.choice-col[style]{
+  overflow:visible;
+}
+.choice-comments{
+  width:100%;
+  max-width:100%;
+  justify-items:stretch !important;
+}
+.choice-comment{
+  width:100% !important;
+  max-width:100% !important;
+  grid-template-columns:12px auto minmax(0,1fr) !important;
+}
+.choice-comment .comment-text{
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  white-space:normal !important;
+  overflow-wrap:anywhere !important;
+  word-break:break-word !important;
+}
+
+
+.home-choice-box{
+  display:grid;
+  gap:10px;
+}
+.home-btn{
+  width:100%;
+  padding:13px 16px;
+}
+.secondary-home{
+  background:transparent;
+  border-style:dashed;
+}
+
+</style>
+</head>
+<body>
+<div class="stage">
+  <main class="sheet"><div class="inner">
+
+    <section id="coverView" class="cover-wrap">
+      <div class="kicker" id="coverKicker">첫 장</div>
+      <h1 class="cover-title">취향 교환일기</h1>
+      <p class="cover-desc" id="coverDesc">먼저 내 이름을 적고<br>같이 쓸 사람을 초대해요.</p>
+
+      <div id="homeChoice" class="name-area hidden">
+        <div class="home-choice-box">
+          <button class="primary-btn home-btn" id="continueBtn">이전 교환일기 이어하기</button>
+          <button class="primary-btn home-btn secondary-home" id="newDiaryBtn">새 교환일기 만들기</button>
+        </div>
+      </div>
+
+      <div class="name-area" id="createForm">
+        <div class="label">내 이름</div>
+        <input class="name-input" id="nameInput" placeholder="이름을 적어주세요" maxlength="12">
+        <div class="hint" id="coverHint">친구에게는 링크만 보내면 돼요.</div>
+        <div class="cover-actions"><button class="primary-btn" id="coverBtn">교환일기 만들기</button></div>
+        <div class="invite-box hidden" id="inviteBox">
+          <div class="waiting">
+            <div class="waiting-title"><span id="inviteOwner"></span>님의 교환일기</div>
+            <div class="waiting-desc">
+              친구에게 아래 링크를 보내주세요.<br>
+              친구가 아직 참여하지 않아도 먼저 작성할 수 있어요.
+            </div>
+            <div class="waiting-link" id="inviteLink"></div>
+            <div class="waiting-actions">
+              <button id="copyBtn">초대 링크 복사</button>
+              <button id="checkGuestBtn">먼저 시작하기</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="name-area hidden" id="guestForm">
+        <div class="label">내 이름</div>
+        <input class="name-input" id="guestNameInput" placeholder="이름을 적어주세요" maxlength="12">
+        <div class="hint" id="guestHint">내 이름을 입력한 뒤에만 질문을 시작할 수 있어요.</div>
+        <div class="cover-actions"><button class="primary-btn" id="guestStartBtn">함께 쓰기</button></div>
+      </div>
+    </section>
+
+    <section id="mainView" class="hidden">
+      <section class="top">
+        <div>
+          <div class="names" id="pairNames"></div>
+          <div class="small">우리의 취향 교환일기</div>
+        </div>
+        
+      </section>
+
+      <section class="completion" id="completion">
+        <div class="done-row">
+          <div class="done-title" id="doneTitle"></div>
+          <div class="stamp" id="doneStamp"></div>
+        </div>
+        <div class="done-sub" id="doneSub"></div>
+      </section>
+
+      <div class="category-row">
+        <div class="category">콘텐츠&덕질</div>
+        <div class="progress" id="progress"></div>
+      </div>
+
+      <p class="intro" id="intro"></p>
+      <div id="hostInviteBar" class="hidden" style="margin:10px 0 14px;">
+        <button id="mainCopyInviteBtn" class="secondary" style="width:auto;padding:7px 10px;font-size:11.5px;">초대 링크 복사</button>
+      </div>
+      <div id="questions"></div>
+
+      <div class="actions">
+        <button id="submitBtn">최종 저장하기</button>
+        <button class="secondary hidden" id="refreshBtn">상대 답변 다시 확인</button>
+      </div>
+
+      <section class="history">
+        <div class="history-title">지난 기록</div>
+        <div id="historyList"><div class="status">아직 지난 기록이 없어요.</div></div>
+      </section>
+    </section>
+
+  </div></main>
+</div>
+<div class="toast hidden" id="toast"></div>
+
+<script>
+const SUPABASE_URL = "https://nimtmdmcxkbmkjqirmmh.supabase.co";
+const SUPABASE_KEY = "sb_publishable_XRJuZeYb1QYYr4l1-FAaeA_gEyHsAxf";
+
+const bank = [["최애 한 명 깊게 파기","여러 캐릭터 골고루 덕질하기"],["얼굴이 취향인 캐릭터","성격이 취향인 캐릭터"],["능력치 만렙 주인공","점점 성장하는 주인공"],["모든 떡밥 깔끔하게 회수","해석의 여지 남는 결말"],["다시 볼수록 좋은 작품","처음 봤을 때 충격적인 작품"],["스토리가 완벽한 작품","캐릭터가 미친 작품"],["악역에게 서사가 있는 작품","끝까지 순수 악인 작품"],["평소엔 장꾸인데 결정적일 때 진지한 캐릭터","평소엔 냉정한데 가끔 허당미 있는 캐릭터"],["내가 좋아하는 캐릭터 인기 순위 꼴찌","내가 안좋아하는 캐릭터 인기 순위 1등"],["최애가 행복한 결말","작품적으로 완벽한 비극"],["대사가 오래 기억에 남는 작품","장면이 오래 기억에 남는 작품"],["OST가 돋보이는 작품","미장센이 돋보이는 작품"],["말 많고 능글맞은 캐릭터","과묵하고 무심한 캐릭터"],["복선 발견하면서 보기","아무것도 모르고 반전 맞기"],["완결작 한번에 몰아보기","연재작 실시간으로 달리기"],["외유내강 캐릭터","외강내유 캐릭터"],["최애가 죽는 작품","최애가 흑화하는 작품"],["두 주인공의 관계에 집중하는 작품","여러 인물의 관계가 얽히는 작품"],["주인공의 가족 이야기","친구 이야기"],["영상 먼저 보기","원작 먼저 보기"],["예고편 먼저 보기","정보 하나도 없이 보기"],["스토리가 촘촘한 미스터리 작품","세계관이 방대한 판타지 작품"],["마법학교에서 기숙사 생활","왕궁에서 귀족 생활"],["슬라임 한 마리 키우기","드래곤 한 마리 키우기"],["시간을 달리는 소녀","공간을 넘나드는 소녀"],["혼자 극장에서 영화 보기","여럿이 집에서 OTT 보기"],["오타와 비문투성인 자막","몰입 깨는 성우의 발연기"],["중요한 장면 스포 당하기","완결까지 10년 기다리기"],["90분짜리 밀도 높은 영화","10부작으로 천천히 쌓는 드라마"],["탐정 시점으로 범인 쫓기","범인 시점으로 수사망 피하기"],["좋아하는 굿즈 실사용","절대 뜯지 않고 소장"],["인생작의 시즌2 영원히 안 나옴","시즌2 나왔는데 전작보다 별로임"],["결말 스포 당하고 보기","보고도 결말 이해 못하기"]];
+
+const API = SUPABASE_URL + "/rest/v1";
+const HEADERS = {
+  "apikey":SUPABASE_KEY,
+  "Authorization":"Bearer "+SUPABASE_KEY,
+  "Content-Type":"application/json"
+};
+
+let roomId = "";
+let memberId = localStorage.getItem("taste_member_id") || crypto.randomUUID();
+localStorage.setItem("taste_member_id",memberId);
+
+let myName = "";
+let partnerName = "";
+let myRole = "";
+let submitted = false;
+let draftSavePromise = Promise.resolve();
+let isSubmitting = false;
+let partnerSubmitted = false;
+let mine = {};
+let partnerAnswers = {};
+let roomCreatedAt = null;
+
+const $ = s => document.querySelector(s);
+
+function toast(msg){
+  const el=$("#toast"); el.textContent=msg; el.classList.remove("hidden");
+  clearTimeout(window.__toast); window.__toast=setTimeout(()=>el.classList.add("hidden"),2200);
+}
+async function api(path, opts={}){
+  const r=await fetch(API+path, {...opts, headers:{...HEADERS,...(opts.headers||{})}});
+  if(!r.ok){
+    const t=await r.text();
+    throw new Error(t || ("HTTP "+r.status));
+  }
+  if(r.status===204) return null;
+  const txt=await r.text();
+  return txt ? JSON.parse(txt) : null;
+}
+function roomLink(id, host){
+  // Use a real query-string URL so opening an invite always performs a full page load.
+  // This prevents the creator's already-open question screen from being reused when testing the invite.
+  return location.origin + location.pathname + "?join=" + encodeURIComponent(id) + "&host=" + encodeURIComponent(host);
+}
+function todayKey(){
+  return new Date().toLocaleDateString("en-CA");
+}
+function stampDate(){
+  const d=new Date();
+  return `DONE · ${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")}`;
+}
+function parseInvite(){
+  // New links use ?join=... so the browser reloads the page.
+  // Keep #join=... support for any old invitation links already shared.
+  const q=new URLSearchParams(location.search);
+  if(q.get("join")) return {join:q.get("join"), host:q.get("host")};
+  const h=new URLSearchParams(location.hash.replace(/^#/,""));
+  return {join:h.get("join"), host:h.get("host")};
+}
+
+async function createRoom(name){
+  roomId = "d_" + crypto.randomUUID().replaceAll("-","").slice(0,14);
+  const body = {
+    room_id:roomId,
+    host_name:name,
+    guest_name:null,
+    created_at:new Date().toISOString()
+  };
+  await api("/exchange_rooms", {
+    method:"POST",
+    headers:{"Prefer":"return=minimal"},
+    body:JSON.stringify(body)
+  });
+  await upsertMember("host", name);
+  myRole="host"; myName=name; partnerName="";
+  localStorage.setItem("taste_room_"+roomId, JSON.stringify({role:"host",name}));
+  localStorage.setItem("taste_last_host_room", JSON.stringify({roomId,name}));
+}
+
+async function joinRoom(id,name){
+  roomId=id;
+  const rooms=await api("/exchange_rooms?select=*&room_id=eq."+encodeURIComponent(id));
+  if(!rooms?.length) throw new Error("존재하지 않는 초대 링크예요.");
+  const room=rooms[0];
+  roomCreatedAt=room.created_at;
+  partnerName=room.host_name;
+  myRole="guest"; myName=name;
+
+  if(room.guest_name && room.guest_name!==name){
+    throw new Error("이미 다른 친구가 참여한 교환일기예요.");
+  }
+  if(!room.guest_name){
+    await api("/exchange_rooms?room_id=eq."+encodeURIComponent(id), {
+      method:"PATCH",
+      headers:{"Prefer":"return=minimal"},
+      body:JSON.stringify({guest_name:name})
+    });
+  }
+  await upsertMember("guest",name);
+  localStorage.setItem("taste_room_"+roomId, JSON.stringify({role:"guest",name}));
+}
+
+async function upsertMember(role,name){
+  await api("/exchange_members?room_id=eq."+encodeURIComponent(roomId)+"&role=eq."+role, {
+    method:"DELETE", headers:{"Prefer":"return=minimal"}
+  });
+  await api("/exchange_members", {
+    method:"POST",
+    headers:{"Prefer":"return=minimal"},
+    body:JSON.stringify({
+      room_id:roomId, role, nickname:name, member_token:memberId
+    })
+  });
+}
+
+
+async function checkGuestAndEnter(){
+  const rooms=await api("/exchange_rooms?select=*&room_id=eq."+encodeURIComponent(roomId));
+  if(!rooms?.length) throw new Error("교환일기를 찾을 수 없어요.");
+  const room=rooms[0];
+
+  if(!room.guest_name){
+    toast("아직 친구가 이름을 적지 않았어요.");
+    return false;
+  }
+
+  partnerName=room.guest_name;
+  await enterMain();
+  return true;
+}
+
+async function loadRoom(){
+  const rooms=await api("/exchange_rooms?select=*&room_id=eq."+encodeURIComponent(roomId));
+  if(!rooms?.length) throw new Error("교환일기를 찾을 수 없어요.");
+  const room=rooms[0];
+  roomCreatedAt=room.created_at;
+  if(myRole==="host"){ myName=room.host_name; partnerName=room.guest_name||"친구"; }
+  else { myName=room.guest_name||myName; partnerName=room.host_name; }
+}
+
+async function loadToday(){
+  const date=todayKey();
+  const rows=await api(
+    "/exchange_entries?select=*&room_id=eq."+encodeURIComponent(roomId)+
+    "&entry_date=eq."+date+"&category=eq.content"
+  );
+  const mineRow=rows?.find(x=>x.role===myRole);
+  const partnerRole=myRole==="host"?"guest":"host";
+  const partnerRow=rows?.find(x=>x.role===partnerRole);
+
+  mine = mineRow?.answers || {};
+  submitted = !!mineRow?.submitted_at;
+  partnerAnswers = partnerRow?.answers || {};
+  partnerSubmitted = !!partnerRow?.submitted_at;
+}
+
+async function upsertEntry(payload){
+  const conflict = "room_id,entry_date,category,role";
+  await api("/exchange_entries?on_conflict="+encodeURIComponent(conflict), {
+    method:"POST",
+    headers:{
+      "Prefer":"resolution=merge-duplicates,return=minimal"
+    },
+    body:JSON.stringify(payload)
+  });
+}
+
+function queueDraftSave(){
+  if(submitted || isSubmitting) return draftSavePromise;
+
+  const date=todayKey();
+  const snapshot=JSON.parse(JSON.stringify(mine));
+
+  draftSavePromise = draftSavePromise
+    .catch(()=>{})
+    .then(()=>upsertEntry({
+      room_id:roomId,
+      entry_date:date,
+      category:"content",
+      role:myRole,
+      nickname:myName,
+      answers:snapshot,
+      submitted_at:null
+    }));
+
+  return draftSavePromise;
+}
+
+async function saveDraft(){
+  return queueDraftSave();
+}
+
+async function finalSubmit(){
+  const date=todayKey();
+
+  // Wait for any blur/change draft save that fired just before the submit click.
+  await draftSavePromise.catch(()=>{});
+
+  await upsertEntry({
+    room_id:roomId,
+    entry_date:date,
+    category:"content",
+    role:myRole,
+    nickname:myName,
+    answers:mine,
+    submitted_at:new Date().toISOString()
+  });
+
+  submitted=true;
+}
+
+async function loadHistory(){
+  const rows=await api(
+    "/exchange_entries?select=entry_date,category,role,submitted_at&room_id=eq."+encodeURIComponent(roomId)+
+    "&submitted_at=not.is.null&order=entry_date.desc"
+  );
+  const grouped={};
+  (rows||[]).forEach(r=>{
+    grouped[r.entry_date] ||= new Set();
+    grouped[r.entry_date].add(r.role);
+  });
+  const dates=Object.entries(grouped).filter(([_,set])=>set.size===2).slice(0,10);
+  const box=$("#historyList");
+  if(!dates.length){ box.innerHTML='<div class="status">아직 완성된 지난 기록이 없어요.</div>'; return; }
+  box.innerHTML=dates.map(([d])=>`<div class="history-item"><span>${d} · 콘텐츠&덕질</span><span>${bank.length}문답</span></div>`).join("");
+}
+
+
+function syncResultCommentWidths(root=document){
+  requestAnimationFrame(()=>{
+    root.querySelectorAll(".choice-col").forEach(col=>{
+      const choice = col.querySelector(".choice-text");
+      const comments = col.querySelector(".choice-comments");
+      if(!choice || !comments || !comments.children.length) return;
+
+      const rect = choice.getBoundingClientRect();
+      const width = Math.ceil(rect.width);
+      if(width > 0){
+        col.style.width = `${width}px`;
+        col.style.maxWidth = `${width}px`;
+        col.style.justifySelf = 'start';
+        comments.style.width = '100%';
+        comments.style.maxWidth = '100%';
+        comments.querySelectorAll('.choice-comment').forEach(item=>{
+          item.style.width = '100%';
+          const txt = item.querySelector('.comment-text');
+          if(txt){
+            txt.style.maxWidth = '100%';
+            txt.style.width = '100%';
+          }
+        });
+      }
+    });
+  });
+}
+
+function renderMain(){
+  $("#pairNames").textContent=`${myName} × ${partnerName||"친구"}`;
+  const inviteBar=$("#hostInviteBar");
+  if(inviteBar){
+    inviteBar.classList.toggle("hidden", !(myRole==="host" && (!partnerName || partnerName==="친구")));
+  }
+    $("#doneStamp").textContent=stampDate();
+
+  let answered=0;
+  const box=$("#questions"); box.innerHTML="";
+
+  bank.forEach((q,i)=>{
+    const a=mine[i]||{};
+    if(a.pick) answered++;
+    const sec=document.createElement("section");
+    sec.className="q"+(submitted?" locked":"");
+
+    const pa=partnerAnswers[i]||{};
+    const showComments=submitted && partnerSubmitted;
+
+    const myCommentA = showComments && a.pick==="A"
+      ? `<div class="choice-comment my-comment"><span class="arrow">↳</span><span class="comment-name">${myName}</span><span class="comment-text">${a.reason||""}</span></div>`
+      : "";
+    const myCommentB = showComments && a.pick==="B"
+      ? `<div class="choice-comment my-comment"><span class="arrow">↳</span><span class="comment-name">${myName}</span><span class="comment-text">${a.reason||""}</span></div>`
+      : "";
+    const friendCommentA = showComments && pa.pick==="A"
+      ? `<div class="choice-comment partner-comment"><span class="arrow">↳</span><span class="comment-name">${partnerName}</span><span class="comment-text">${pa.reason||""}</span></div>`
+      : "";
+    const friendCommentB = showComments && pa.pick==="B"
+      ? `<div class="choice-comment partner-comment"><span class="arrow">↳</span><span class="comment-name">${partnerName}</span><span class="comment-text">${pa.reason||""}</span></div>`
+      : "";
+
+    sec.innerHTML=`
+      <div class="qline">
+        <div class="choice-col">
+          <span class="choice-text ${a.pick==="A"?"selected":""}" data-p="A">${q[0]}</span>
+          ${showComments ? `<div class="choice-comments">${myCommentA}${friendCommentA}</div>` : ""}
+        </div>
+
+        <span class="vs">vs</span>
+
+        <div class="choice-col">
+          <span class="choice-text ${a.pick==="B"?"selected":""}" data-p="B">${q[1]}</span>
+          ${showComments ? `<div class="choice-comments">${myCommentB}${friendCommentB}</div>` : ""}
+        </div>
+      </div>
+
+      ${!showComments
+        ? `<input class="question-comment-input" placeholder="코멘트 한 줄..." value="${(a.reason||"").replaceAll('"','&quot;')}" ${submitted?"readonly":""}>`
+        : ""}
+
+      <div class="result"></div>`;
+
+    if(!submitted){
+      sec.querySelectorAll(".choice-text").forEach(opt=>opt.onclick=async()=>{
+        mine[i] ||= {};
+        mine[i].pick=opt.dataset.p;
+        mine[i].reason = mine[i].reason || "";
+        renderMain();
+        try{await queueDraftSave();}catch(e){console.error(e)}
+      });
+
+      const commentInput = sec.querySelector(".question-comment-input");
+      if(commentInput){
+        commentInput.onchange=async e=>{
+          mine[i] ||= {};
+          mine[i].reason=e.target.value;
+          try{await queueDraftSave();}catch(err){console.error(err)}
+        };
+      }
+    }
+
+    if(submitted && !partnerSubmitted){
+      sec.querySelector(".result").innerHTML=
+        `<div class="status">${partnerName||"친구"}의 최종 답변을 기다리는 중...</div>`;
+    }
+
+    box.appendChild(sec);
+    if(showComments) syncResultCommentWidths(sec);
+  });
+
+  if(!submitted){
+    $("#progress").textContent=`${answered}/${bank.length} 답변`;
+    $("#intro").innerHTML="모든 질문을 선택한 뒤 최종 저장해요.<br>제출 전에는 서로의 선택과 이유가 보이지 않아요.";
+    $("#submitBtn").classList.remove("hidden");
+    $("#submitBtn").disabled=false;
+    $("#submitBtn").textContent=`최종 저장하기 (${answered}/${bank.length})`;
+    $("#refreshBtn").classList.add("hidden");
+    $("#completion").classList.remove("show");
+  } else if(!partnerSubmitted){
+    $("#progress").textContent="내 답변 제출 완료";
+    $("#intro").textContent="내 답변은 수정할 수 없어요. 상대방의 최종 제출을 기다리고 있어요.";
+    $("#submitBtn").textContent="최종 저장 완료";
+    $("#submitBtn").disabled=true;
+    $("#refreshBtn").classList.remove("hidden");
+    $("#completion").classList.add("show");
+    $("#doneTitle").textContent="오늘의 답변 제출 완료";
+    $("#doneSub").textContent=`내 답변은 잠겼어요. ${partnerName||"친구"}가 제출하면 서로의 답이 열려요.`;
+  } else {
+    $("#progress").textContent="둘 다 제출 완료";
+    $("#intro").textContent="같은 질문에 대한 서로의 답을 천천히 구경해봐요.";
+    $("#submitBtn").classList.add("hidden");
+    $("#refreshBtn").classList.add("hidden");
+    $("#completion").classList.add("show");
+    $("#doneTitle").textContent="오늘의 교환일기 완성";
+    $("#doneSub").textContent="둘 다 답변을 마쳤어요. 서로의 선택과 이유가 모두 공개됐어요.";
+  }
+}
+
+async function enterMain(){
+  await loadRoom();
+  $("#coverView").classList.add("hidden");
+  $("#mainView").classList.remove("hidden");
+  await loadToday();
+  renderMain();
+  await loadHistory();
+}
+
+$("#coverBtn").onclick=async()=>{
+  const name=$("#nameInput").value.trim();
+  if(!name) return alert("이름을 적어주세요.");
+  try{
+    const h=parseInvite();
+    if(h.join){
+      await joinRoom(h.join,name);
+      await enterMain();
+    } else {
+      await createRoom(name);
+      const link=roomLink(roomId,name);
+      $("#inviteOwner").textContent=name;
+      $("#inviteLink").textContent=link;
+      $("#inviteBox").classList.remove("hidden");
+    }
+  }catch(e){ alert("오류가 발생했어요.\n"+e.message); }
+};
+
+$("#guestStartBtn").onclick=async()=>{
+  const name=$("#guestNameInput").value.trim();
+  if(!name) return alert("이름을 적어주세요.");
+  try{
+    const h=parseInvite();
+    if(!h.join) return alert("초대 링크 정보가 없어요.");
+    await joinRoom(h.join,name);
+    await enterMain();
+  }catch(e){ alert("오류가 발생했어요.\n"+e.message); }
+};
+
+$("#copyBtn").onclick=async()=>{
+  try{await navigator.clipboard.writeText($("#inviteLink").textContent);toast("초대 링크를 복사했어요.");}
+  catch{toast("링크를 길게 눌러 복사해 주세요.");}
+};
+
+$("#mainCopyInviteBtn").onclick=async()=>{
+  const link=roomLink(roomId,myName);
+  try{await navigator.clipboard.writeText(link);toast("초대 링크를 복사했어요.");}
+  catch{toast("초대 링크 복사에 실패했어요.");}
+};
+
+$("#checkGuestBtn").onclick=async()=>{
+  try{
+    await enterMain();
+  }catch(e){
+    alert("시작 중 오류가 발생했어요.\n"+e.message);
+  }
+};
+
+
+$("#submitBtn").onclick=async()=>{
+  if(isSubmitting) return;
+
+  const missing=[];
+  bank.forEach((_,i)=>{if(!mine[i]?.pick) missing.push(i+1)});
+  if(missing.length) return alert("아직 선택하지 않은 문항이 있어요: "+missing.join(", ")+"번");
+  if(!confirm("오늘 답변을 최종 저장할까요?\n제출 후에는 수정할 수 없어요.")) return;
+
+  const btn=$("#submitBtn");
+  isSubmitting=true;
+  btn.disabled=true;
+  btn.textContent="저장 중...";
+
+  try{
+    await finalSubmit();
+    await loadToday();
+    renderMain();
+    await loadHistory();
+  }catch(e){
+    isSubmitting=false;
+    btn.disabled=false;
+    renderMain();
+    alert("저장 중 오류가 발생했어요.\n"+e.message);
+    return;
+  }
+
+  isSubmitting=false;
+};
+
+$("#refreshBtn").onclick=async()=>{
+  try{await loadRoom();await loadToday();renderMain();await loadHistory();toast("상대 답변을 다시 확인했어요.");}
+  catch(e){alert(e.message)}
+};
+
+
+function showCreateForm(){
+  $("#homeChoice").classList.add("hidden");
+  $("#guestForm").classList.add("hidden");
+  $("#createForm").classList.remove("hidden");
+  $("#coverKicker").textContent="첫 장";
+  $("#coverDesc").innerHTML="먼저 내 이름을 적고<br>같이 쓸 사람을 초대해요.";
+  $("#coverHint").textContent="친구에게는 링크만 보내면 돼요.";
+  $("#coverBtn").textContent="교환일기 만들기";
+  $("#nameInput").value="";
+  $("#inviteBox").classList.add("hidden");
+}
+
+async function continueLastRoom(){
+  const lastRoom=localStorage.getItem("taste_last_host_room");
+  if(!lastRoom) return showCreateForm();
+  const x=JSON.parse(lastRoom);
+  roomId=x.roomId;
+  myRole="host";
+  myName=x.name;
+  await enterMain();
+}
+
+$("#continueBtn").onclick=async()=>{
+  try{ await continueLastRoom(); }
+  catch(e){
+    console.error(e);
+    alert("이전 교환일기를 불러오지 못했어요. 새 교환일기를 만들어주세요.");
+    showCreateForm();
+  }
+};
+
+$("#newDiaryBtn").onclick=()=>{
+  showCreateForm();
+};
+
+(async function init(){
+  const h=parseInvite();
+
+  // Invite links ALWAYS stop at a dedicated guest name-entry screen first.
+  // No localStorage state is allowed to skip this step.
+  if(h.join){
+    $("#mainView").classList.add("hidden");
+    $("#coverView").classList.remove("hidden");
+    $("#homeChoice").classList.add("hidden");
+    $("#createForm").classList.add("hidden");
+    $("#guestForm").classList.remove("hidden");
+    $("#coverKicker").textContent="초대장";
+    $("#coverDesc").innerHTML=`<b>${h.host||"친구"}</b>님이<br>같이 쓰자고 초대했어요.`;
+    $("#guestNameInput").value="";
+    $("#guestNameInput").focus();
+    return;
+  }
+
+  // Normal site visits never auto-enter an old room.
+  const lastRoom=localStorage.getItem("taste_last_host_room");
+  if(lastRoom){
+    $("#createForm").classList.add("hidden");
+    $("#homeChoice").classList.remove("hidden");
+    $("#coverKicker").textContent="첫 장";
+    $("#coverDesc").innerHTML="이전에 쓰던 교환일기가 있어요.<br>이어 쓰거나 새로 시작할 수 있어요.";
+  }else{
+    showCreateForm();
+  }
+})();
+
+window.addEventListener("resize", ()=>{
+  if(submitted && partnerSubmitted) syncResultCommentWidths(document);
+});
+
+</script>
+</body>
+</html>
